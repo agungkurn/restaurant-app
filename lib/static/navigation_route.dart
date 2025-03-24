@@ -2,7 +2,7 @@ enum NavigationRoute {
   home("/"),
   details("/details");
 
-  const NavigationRoute(this.deeplink);
+  const NavigationRoute(this.routeName);
 
-  final String deeplink;
+  final String routeName;
 }

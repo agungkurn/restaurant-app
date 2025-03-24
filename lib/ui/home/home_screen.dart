@@ -3,7 +3,11 @@ import 'package:flutter_submission_2/data/model/restaurant_list_item.dart';
 import 'package:flutter_submission_2/provider/restaurant_list_provider.dart';
 import 'package:flutter_submission_2/static/navigation_route.dart';
 import 'package:flutter_submission_2/static/ui_state.dart';
+import 'package:flutter_submission_2/ui/search/restaurant_search_delegate.dart';
 import 'package:provider/provider.dart';
+
+import '../../provider/search_restaurant_provider.dart';
+import '../restaurant_item_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,126 +27,58 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 200,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              centerTitle: true,
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text("Restaurant"),
-                  Text(
-                    "Find your own taste",
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                ],
-              ),
-              titlePadding: EdgeInsets.symmetric(vertical: 16),
-            ),
-          ),
-          Consumer<RestaurantListProvider>(
-            builder:
-                (context, value, child) => switch (value.uiState) {
-                  Loading() => SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                  Success<List<RestaurantListItem>>(data: var restaurants) =>
-                    SliverList.builder(
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: Text("Restaurant"),
+      actions: [
+        IconButton(
+          onPressed: () async {
+            context.read<SearchRestaurantProvider>().resetState();
+
+            final restaurant = await showSearch(
+              context: context,
+              delegate: RestaurantSearchDelegate(),
+            );
+            if (restaurant is RestaurantListItem && context.mounted) {
+              Navigator.of(context).pushNamed(
+                NavigationRoute.details.routeName,
+                arguments: restaurant.id,
+              );
+            }
+          },
+          icon: Icon(Icons.search),
+        ),
+      ],
+    ),
+    body: Column(
+      children: [
+        Consumer<RestaurantListProvider>(
+          builder:
+              (context, value, child) => switch (value.uiState) {
+                Loading() => Expanded(
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                Success<List<RestaurantListItem>>(data: var restaurants) =>
+                  Expanded(
+                    child: ListView.builder(
                       itemCount: restaurants.length,
                       itemBuilder:
                           (context, i) =>
-                              RestaurantItem(context, restaurants[i], () {
+                              RestaurantItemWidget(context, restaurants[i], () {
                                 Navigator.of(context).pushNamed(
-                                  NavigationRoute.details.deeplink,
+                                  NavigationRoute.details.routeName,
                                   arguments: restaurants[i].id,
                                 );
                               }),
                     ),
-                  Error(errorMessage: var msg) => SliverFillRemaining(
-                    child: Center(child: Text(msg)),
                   ),
-                  _ => SliverFillRemaining(),
-                },
-          ),
-          SliverPadding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).padding.bottom,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget RestaurantItem(
-    BuildContext context,
-    RestaurantListItem item,
-    Function() onClick,
-  ) => InkWell(
-    onTap: onClick,
-    child: Container(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 120,
-            height: 80,
-            margin: EdgeInsets.only(right: 8),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(item.picture, fit: BoxFit.cover),
-            ),
-          ),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.name,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 2,
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
+                Error(errorMessage: var msg) => Expanded(
+                  child: Center(child: Text(msg)),
                 ),
-                Row(
-                  children: [
-                    Icon(Icons.location_pin, color: Colors.black54),
-                    Text(
-                      item.city,
-                      maxLines: 1,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.orange),
-                    Text(
-                      item.rating.toString(),
-                      style: Theme.of(
-                        context,
-                      ).textTheme.labelSmall?.copyWith(color: Colors.black54),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+                _ => SizedBox(),
+              },
+        ),
+      ],
     ),
   );
 }

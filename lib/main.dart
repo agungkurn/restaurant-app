@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_submission_2/data/api/api_services.dart';
 import 'package:flutter_submission_2/provider/restaurant_details_provider.dart';
 import 'package:flutter_submission_2/provider/restaurant_list_provider.dart';
+import 'package:flutter_submission_2/provider/search_restaurant_provider.dart';
 import 'package:flutter_submission_2/static/navigation_route.dart';
 import 'package:flutter_submission_2/style/theme/restaurant_theme.dart';
 import 'package:flutter_submission_2/ui/details/details_screen.dart';
@@ -22,6 +23,11 @@ void main() {
               (context) =>
                   RestaurantDetailsProvider(context.read<ApiServices>()),
         ),
+        ChangeNotifierProvider(
+          create:
+              (context) =>
+                  SearchRestaurantProvider(context.read<ApiServices>()),
+        ),
       ],
       child: const RestaurantApp(),
     ),
@@ -39,10 +45,10 @@ class RestaurantApp extends StatelessWidget {
       theme: RestaurantTheme.lightTheme,
       darkTheme: RestaurantTheme.darkTheme,
       themeMode: ThemeMode.system,
-      initialRoute: NavigationRoute.home.deeplink,
+      initialRoute: NavigationRoute.home.routeName,
       routes: {
-        NavigationRoute.home.deeplink: (context) => const HomeScreen(),
-        NavigationRoute.details.deeplink:
+        NavigationRoute.home.routeName: (context) => const HomeScreen(),
+        NavigationRoute.details.routeName:
             (context) => DetailsScreen(
               id: ModalRoute.of(context)?.settings.arguments as String,
             ),
