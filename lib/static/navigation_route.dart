@@ -1,6 +1,7 @@
 enum NavigationRoute {
   home("/"),
-  details("/details");
+  details("/details"),
+  goToList("/go-to");
 
   const NavigationRoute(this.routeName);
 

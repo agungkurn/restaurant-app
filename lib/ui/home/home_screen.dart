@@ -48,6 +48,12 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           icon: Icon(Icons.search),
         ),
+        IconButton(
+          onPressed: () {
+            Navigator.of(context).pushNamed(NavigationRoute.goToList.routeName);
+          },
+          icon: Icon(Icons.playlist_play),
+        ),
       ],
     ),
     body: Column(
@@ -67,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               RestaurantItemWidget(context, restaurants[i], () {
                                 Navigator.of(context).pushNamed(
                                   NavigationRoute.details.routeName,
-                                  arguments: restaurants[i].id,
+                                  arguments: restaurants[i],
                                 );
                               }),
                     ),

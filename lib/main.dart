@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_submission_2/data/api/api_services.dart';
+import 'package:flutter_submission_2/data/local/local_database_services.dart';
+import 'package:flutter_submission_2/data/model/restaurant_list_item.dart';
+import 'package:flutter_submission_2/provider/go_to_list_provider.dart';
 import 'package:flutter_submission_2/provider/restaurant_details_provider.dart';
 import 'package:flutter_submission_2/provider/restaurant_list_provider.dart';
 import 'package:flutter_submission_2/provider/search_restaurant_provider.dart';
 import 'package:flutter_submission_2/static/navigation_route.dart';
 import 'package:flutter_submission_2/style/theme/restaurant_theme.dart';
 import 'package:flutter_submission_2/ui/details/details_screen.dart';
+import 'package:flutter_submission_2/ui/go_to_list/go_to_list_screen.dart';
 import 'package:flutter_submission_2/ui/home/home_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +18,7 @@ void main() {
     MultiProvider(
       providers: [
         Provider(create: (context) => ApiServices()),
+        Provider(create: (context) => LocalDatabaseServices()),
         ChangeNotifierProvider(
           create:
               (context) => RestaurantListProvider(context.read<ApiServices>()),
@@ -27,6 +32,11 @@ void main() {
           create:
               (context) =>
                   SearchRestaurantProvider(context.read<ApiServices>()),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (context) =>
+                  GoToListProvider(context.read<LocalDatabaseServices>()),
         ),
       ],
       child: const RestaurantApp(),
@@ -50,8 +60,11 @@ class RestaurantApp extends StatelessWidget {
         NavigationRoute.home.routeName: (context) => const HomeScreen(),
         NavigationRoute.details.routeName:
             (context) => DetailsScreen(
-              id: ModalRoute.of(context)?.settings.arguments as String,
+              restaurantListItem:
+                  ModalRoute.of(context)?.settings.arguments
+                      as RestaurantListItem,
             ),
+        NavigationRoute.goToList.routeName: (context) => const GoToListScreen(),
       },
     );
   }

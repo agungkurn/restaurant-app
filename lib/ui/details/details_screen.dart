@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_submission_2/data/model/restaurant_details.dart';
+import 'package:flutter_submission_2/data/model/restaurant_list_item.dart';
+import 'package:flutter_submission_2/provider/go_to_list_provider.dart';
 import 'package:flutter_submission_2/provider/restaurant_details_provider.dart';
 import 'package:flutter_submission_2/static/ui_state.dart';
 import 'package:flutter_submission_2/ui/details/description_widget.dart';
@@ -9,9 +11,9 @@ import 'package:flutter_submission_2/ui/details/tab_bar_delegate.dart';
 import 'package:provider/provider.dart';
 
 class DetailsScreen extends StatefulWidget {
-  final String id;
+  final RestaurantListItem restaurantListItem;
 
-  const DetailsScreen({super.key, required this.id});
+  const DetailsScreen({super.key, required this.restaurantListItem});
 
   @override
   State<DetailsScreen> createState() => _DetailsScreenState();
@@ -22,7 +24,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<RestaurantDetailsProvider>().fetch(widget.id);
+      context.read<RestaurantDetailsProvider>().fetch(
+        widget.restaurantListItem.id,
+      );
     });
   }
 
@@ -79,6 +83,51 @@ class _DetailsScreenState extends State<DetailsScreen> {
               _ => SizedBox(),
             },
       ),
+    );
+  }
+
+  Widget DetailsAppBar(RestaurantDetails details, BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 200,
+      floating: false,
+      pinned: true,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Image.network(details.picture, fit: BoxFit.cover),
+      ),
+      leading: IconButton.filledTonal(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        icon: Icon(Icons.arrow_back),
+      ),
+      actions: [
+        Selector<GoToListProvider, bool>(
+          selector: (_, provider) => provider.isInList(details.id),
+          builder: (context, isFavorite, child) {
+            return IconButton.filledTonal(
+              onPressed: () {
+                final provider = context.read<GoToListProvider>();
+                isFavorite
+                    ? provider.removeFromList(details.id)
+                    : provider.addToList(widget.restaurantListItem);
+
+                final snackbar = SnackBar(
+                  content:
+                      isFavorite
+                          ? Text("Removed from \"Go To List\"")
+                          : Text("Added to \"Go To List\""),
+                );
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(snackbar);
+              },
+              icon: Icon(
+                isFavorite ? Icons.playlist_add_check : Icons.playlist_add,
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -156,23 +205,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     .toList(),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget DetailsAppBar(RestaurantDetails details, BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: 200,
-      floating: false,
-      pinned: true,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Image.network(details.picture, fit: BoxFit.cover),
-      ),
-      leading: IconButton.filledTonal(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        icon: Icon(Icons.arrow_back),
       ),
     );
   }

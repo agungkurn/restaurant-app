@@ -31,4 +31,18 @@ class RestaurantListItem {
         city: json["city"],
         rating: json["rating"]?.toDouble(),
       );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'pictureId':
+          picture.startsWith(Constants.baseImageSmallUrl)
+              ? picture.substring(Constants.baseImageSmallUrl.length)
+              : picture,
+      'city': city,
+      'rating': rating,
+    };
+  }
 }
