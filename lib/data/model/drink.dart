@@ -1,12 +1,15 @@
 import 'dart:convert';
 
-class Drink {
-  final String name;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  Drink({required this.name});
+part 'drink.freezed.dart';
+part 'drink.g.dart';
+
+@freezed
+abstract class Drink with _$Drink {
+  factory Drink({required String name}) = _Drink;
 
   factory Drink.fromRawJson(String str) => Drink.fromJson(json.decode(str));
 
-  factory Drink.fromJson(Map<String, dynamic> json) =>
-      Drink(name: json["name"]);
+  factory Drink.fromJson(Map<String, dynamic> json) => _$DrinkFromJson(json);
 }

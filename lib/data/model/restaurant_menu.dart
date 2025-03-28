@@ -1,19 +1,23 @@
 import 'dart:convert';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'drink.dart';
 import 'food.dart';
 
-class RestaurantMenu {
-  final List<Food> foods;
-  final List<Drink> drinks;
+part 'restaurant_menu.freezed.dart';
+part 'restaurant_menu.g.dart';
 
-  RestaurantMenu({required this.foods, required this.drinks});
+@freezed
+abstract class RestaurantMenu with _$RestaurantMenu {
+  factory RestaurantMenu({
+    required List<Food> foods,
+    required List<Drink> drinks,
+  }) = _RestaurantMenu;
 
   factory RestaurantMenu.fromRawJson(String str) =>
       RestaurantMenu.fromJson(json.decode(str));
 
-  factory RestaurantMenu.fromJson(Map<String, dynamic> json) => RestaurantMenu(
-    foods: List<Food>.from(json["foods"].map((x) => Food.fromJson(x))),
-    drinks: List<Drink>.from(json["drinks"].map((x) => Drink.fromJson(x))),
-  );
+  factory RestaurantMenu.fromJson(Map<String, dynamic> json) =>
+      _$RestaurantMenuFromJson(json);
 }

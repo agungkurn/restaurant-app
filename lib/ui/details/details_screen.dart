@@ -1,92 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_submission_2/data/model/restaurant_details.dart';
 import 'package:flutter_submission_2/data/model/restaurant_list_item.dart';
-import 'package:flutter_submission_2/provider/go_to_list_provider.dart';
-import 'package:flutter_submission_2/provider/restaurant_details_provider.dart';
-import 'package:flutter_submission_2/static/ui_state.dart';
+import 'package:flutter_submission_2/provider/details/restaurant_details_provider.dart';
+import 'package:flutter_submission_2/provider/go_to_list/go_to_list_provider.dart';
+import 'package:flutter_submission_2/provider/go_to_list/is_in_list_provider.dart';
 import 'package:flutter_submission_2/ui/details/description_widget.dart';
 import 'package:flutter_submission_2/ui/details/menu_widget.dart';
 import 'package:flutter_submission_2/ui/details/review_widget.dart';
 import 'package:flutter_submission_2/ui/details/tab_bar_delegate.dart';
-import 'package:provider/provider.dart';
 
-class DetailsScreen extends StatefulWidget {
+class DetailsScreen extends ConsumerWidget {
   final RestaurantListItem restaurantListItem;
 
   const DetailsScreen({super.key, required this.restaurantListItem});
 
   @override
-  State<DetailsScreen> createState() => _DetailsScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final detailsState = ref.watch(
+      fetchRestaurantDetailsProvider(restaurantListItem.id),
+    );
 
-class _DetailsScreenState extends State<DetailsScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      context.read<RestaurantDetailsProvider>().fetch(
-        widget.restaurantListItem.id,
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<RestaurantDetailsProvider>(
-        builder:
-            (context, value, child) => switch (value.uiState) {
-              Loading() => Center(child: CircularProgressIndicator()),
-              Success<RestaurantDetails>(data: var details) =>
-                DefaultTabController(
-                  length: 3,
-                  child: NestedScrollView(
-                    headerSliverBuilder:
-                        (context, isScrolled) => [
-                          DetailsAppBar(details, context),
-                          DetailsBasicInfo(details, context),
-                          SliverPersistentHeader(
-                            pinned: true,
-                            delegate: TabBarDelegate(
-                              TabBar(
-                                tabs: [
-                                  Tab(text: "Description"),
-                                  Tab(text: "Menu"),
-                                  Tab(text: "Reviews"),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                    body: TabBarView(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: RestaurantDescriptionWidget(
-                            description: details.description,
+      body: detailsState.when(
+        data:
+            (details) => DefaultTabController(
+              length: 3,
+              child: NestedScrollView(
+                headerSliverBuilder:
+                    (context, isScrolled) => [
+                      DetailsAppBar(context, ref, details),
+                      DetailsBasicInfo(context, details),
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: TabBarDelegate(
+                          TabBar(
+                            tabs: [
+                              Tab(text: "Description"),
+                              Tab(text: "Menu"),
+                              Tab(text: "Reviews"),
+                            ],
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: RestaurantMenuWidget(
-                            restaurantMenu: details.menus,
-                          ),
-                        ),
-                        RestaurantReviewWidget(
-                          reviews: details.customerReviews,
-                        ),
-                      ],
+                      ),
+                    ],
+                body: TabBarView(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: RestaurantDescriptionWidget(
+                        description: details.description,
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: RestaurantMenuWidget(
+                        restaurantMenu: details.menus,
+                      ),
+                    ),
+                    RestaurantReviewWidget(reviews: details.customerReviews),
+                  ],
                 ),
-              Error(errorMessage: var msg) => Center(child: Text(msg)),
-              _ => SizedBox(),
-            },
+              ),
+            ),
+        error: (error, stackTrace) {
+          print(stackTrace);
+          return Center(child: Text(error.toString()));
+        },
+        loading: () => Center(child: CircularProgressIndicator()),
       ),
     );
   }
 
-  Widget DetailsAppBar(RestaurantDetails details, BuildContext context) {
+  Widget DetailsAppBar(
+    BuildContext context,
+    WidgetRef ref,
+    RestaurantDetails details,
+  ) {
+    final goToListState = ref.read(goToListProvider.notifier);
+    final isInListState = ref.watch(isInGoToListProvider(details.id));
+
     return SliverAppBar(
       expandedHeight: 200,
       floating: false,
@@ -101,37 +94,38 @@ class _DetailsScreenState extends State<DetailsScreen> {
         icon: Icon(Icons.arrow_back),
       ),
       actions: [
-        Selector<GoToListProvider, bool>(
-          selector: (_, provider) => provider.isInList(details.id),
-          builder: (context, isFavorite, child) {
-            return IconButton.filledTonal(
-              onPressed: () {
-                final provider = context.read<GoToListProvider>();
-                isFavorite
-                    ? provider.removeFromList(details.id)
-                    : provider.addToList(widget.restaurantListItem);
+        isInListState.when(
+          data:
+              (isInList) => IconButton.filledTonal(
+                onPressed: () {
+                  isInList
+                      ? goToListState.removeFromList(details.id)
+                      : goToListState.addToList(restaurantListItem);
 
-                final snackbar = SnackBar(
-                  content:
-                      isFavorite
-                          ? Text("Removed from \"Go To List\"")
-                          : Text("Added to \"Go To List\""),
-                );
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(snackbar);
-              },
-              icon: Icon(
-                isFavorite ? Icons.playlist_add_check : Icons.playlist_add,
+                  final snackbar = SnackBar(
+                    content:
+                        isInList
+                            ? Text("Removed from \"Go To List\"")
+                            : Text("Added to \"Go To List\""),
+                  );
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(snackbar);
+
+                  ref.invalidate(isInGoToListProvider);
+                },
+                icon: Icon(
+                  isInList ? Icons.playlist_add_check : Icons.playlist_add,
+                ),
               ),
-            );
-          },
+          error: (_, _) => SizedBox.shrink(),
+          loading: () => SizedBox.shrink(),
         ),
       ],
     );
   }
 
-  Widget DetailsBasicInfo(RestaurantDetails details, BuildContext context) {
+  Widget DetailsBasicInfo(BuildContext context, RestaurantDetails details) {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       sliver: SliverList.list(

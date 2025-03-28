@@ -1,48 +1,30 @@
-import 'dart:convert';
-
 import 'package:flutter_submission_2/constants/base_url_constants.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class RestaurantListItem {
-  final String id;
-  final String name;
-  final String description;
-  final String picture;
-  final String city;
-  final double rating;
+part 'restaurant_list_item.freezed.dart';
+part 'restaurant_list_item.g.dart';
 
-  RestaurantListItem({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.picture,
-    required this.city,
-    required this.rating,
-  });
-
-  factory RestaurantListItem.fromRawJson(String str) =>
-      RestaurantListItem.fromJson(json.decode(str));
+@freezed
+abstract class RestaurantListItem with _$RestaurantListItem {
+  factory RestaurantListItem({
+    required String id,
+    required String name,
+    required String description,
+    @JsonKey(name: "pictureId", fromJson: _imageFromJson, toJson: _imageToJson)
+    required String picture,
+    required String city,
+    required double rating,
+  }) = _RestaurantListItem;
 
   factory RestaurantListItem.fromJson(Map<String, dynamic> json) =>
-      RestaurantListItem(
-        id: json["id"],
-        name: json["name"],
-        description: json["description"],
-        picture: "${Constants.baseImageSmallUrl}${json["pictureId"]}",
-        city: json["city"],
-        rating: json["rating"]?.toDouble(),
-      );
+      _$RestaurantListItemFromJson(json);
+}
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'pictureId':
-          picture.startsWith(Constants.baseImageSmallUrl)
-              ? picture.substring(Constants.baseImageSmallUrl.length)
-              : picture,
-      'city': city,
-      'rating': rating,
-    };
-  }
+String _imageFromJson(String pictureId) =>
+    "${Constants.baseImageSmallUrl}$pictureId";
+
+String _imageToJson(String pictureUrl) {
+  return pictureUrl.startsWith(Constants.baseImageSmallUrl)
+      ? pictureUrl.substring(Constants.baseImageSmallUrl.length)
+      : pictureUrl;
 }
