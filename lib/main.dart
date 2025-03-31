@@ -6,9 +6,7 @@ import 'package:flutter_submission_2/provider/settings/theme_settings.dart';
 import 'package:flutter_submission_2/static/navigation_route.dart';
 import 'package:flutter_submission_2/style/theme/restaurant_theme.dart';
 import 'package:flutter_submission_2/ui/details/details_screen.dart';
-import 'package:flutter_submission_2/ui/go_to_list/go_to_list_screen.dart';
-import 'package:flutter_submission_2/ui/home/home_screen.dart';
-import 'package:flutter_submission_2/ui/settings/settings_screen.dart';
+import 'package:flutter_submission_2/ui/main/main_screen.dart';
 
 void main() {
   runApp(ProviderScope(child: const RestaurantApp()));
@@ -58,17 +56,15 @@ class RestaurantApp extends ConsumerWidget {
       theme: RestaurantTheme.lightTheme,
       darkTheme: RestaurantTheme.darkTheme,
       themeMode: themeMode,
-      initialRoute: NavigationRoute.home.routeName,
+      initialRoute: NavigationRoute.main.routeName,
       routes: {
-        NavigationRoute.home.routeName: (context) => const HomeScreen(),
+        NavigationRoute.main.routeName: (context) => const MainScreen(),
         NavigationRoute.details.routeName:
             (context) => DetailsScreen(
               restaurantListItem:
                   ModalRoute.of(context)?.settings.arguments
                       as RestaurantListItem,
             ),
-        NavigationRoute.goToList.routeName: (context) => const GoToListScreen(),
-        NavigationRoute.settings.routeName: (context) => const SettingsScreen(),
       },
     );
   }

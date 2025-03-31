@@ -1,8 +1,6 @@
 enum NavigationRoute {
-  home("/"),
-  details("/details"),
-  goToList("/go-to"),
-  settings("/settings");
+  main("/"),
+  details("/details");
 
   const NavigationRoute(this.routeName);
 
@@ -11,6 +9,6 @@ enum NavigationRoute {
   static NavigationRoute find(String? routeName) =>
       NavigationRoute.values.firstWhere(
         (element) => element.routeName == routeName,
-        orElse: () => NavigationRoute.home,
+        orElse: () => NavigationRoute.main,
       );
 }

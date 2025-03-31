@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_submission_2/data/model/restaurant_details.dart';
 import 'package:flutter_submission_2/data/model/restaurant_list_item.dart';
 import 'package:flutter_submission_2/provider/details/restaurant_details_provider.dart';
-import 'package:flutter_submission_2/provider/go_to_list/go_to_list_provider.dart';
-import 'package:flutter_submission_2/provider/go_to_list/is_in_list_provider.dart';
+import 'package:flutter_submission_2/provider/saved_places/is_in_list_provider.dart';
+import 'package:flutter_submission_2/provider/saved_places/saved_places_provider.dart';
 import 'package:flutter_submission_2/ui/details/description_widget.dart';
 import 'package:flutter_submission_2/ui/details/menu_widget.dart';
 import 'package:flutter_submission_2/ui/details/review_widget.dart';
@@ -77,8 +77,8 @@ class DetailsScreen extends ConsumerWidget {
     WidgetRef ref,
     RestaurantDetails details,
   ) {
-    final goToListState = ref.read(goToListProvider.notifier);
-    final isInListState = ref.watch(isInGoToListProvider(details.id));
+    final goToListState = ref.read(savedPlacesProvider.notifier);
+    final isInListState = ref.watch(isInSavedPlacesProvider(details.id));
 
     return SliverAppBar(
       expandedHeight: 200,
@@ -112,7 +112,7 @@ class DetailsScreen extends ConsumerWidget {
                     ..hideCurrentSnackBar()
                     ..showSnackBar(snackbar);
 
-                  ref.invalidate(isInGoToListProvider);
+                  ref.invalidate(isInSavedPlacesProvider);
                 },
                 icon: Icon(
                   isInList ? Icons.playlist_add_check : Icons.playlist_add,

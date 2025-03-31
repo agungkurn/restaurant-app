@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'is_in_list_provider.g.dart';
 
 @riverpod
-Future<bool> isInGoToList(Ref ref, String id) async {
+Future<bool> isInSavedPlaces(Ref ref, String id) async {
   final db = ref.watch(databaseServicesProvider);
   final list = await db.getAllItems();
   return list.any((item) => item.id == id);

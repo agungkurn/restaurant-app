@@ -3,10 +3,10 @@ import 'package:flutter_submission_2/data/model/restaurant_list_item.dart';
 import 'package:flutter_submission_2/di/local_database_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'go_to_list_provider.g.dart';
+part 'saved_places_provider.g.dart';
 
 @riverpod
-class GoToList extends _$GoToList {
+class SavedPlaces extends _$SavedPlaces {
   LocalDatabaseServices get _db => ref.read(databaseServicesProvider);
 
   @override
