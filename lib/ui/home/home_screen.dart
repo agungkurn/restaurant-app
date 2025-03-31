@@ -41,6 +41,14 @@ class HomeScreen extends ConsumerWidget {
             },
             icon: Icon(Icons.playlist_play),
           ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).pushNamed(NavigationRoute.settings.routeName);
+            },
+            icon: Icon(Icons.settings),
+          ),
         ],
       ),
       body: state.when(
@@ -48,7 +56,7 @@ class HomeScreen extends ConsumerWidget {
             (restaurants) => ListView.builder(
               itemCount: restaurants.length,
               itemBuilder:
-                  (context, i) =>
+                  (listContext, i) =>
                       RestaurantItemWidget(context, restaurants[i], () {
                         Navigator.of(context).pushNamed(
                           NavigationRoute.details.routeName,

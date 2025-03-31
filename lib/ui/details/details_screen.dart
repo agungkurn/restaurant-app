@@ -147,15 +147,15 @@ class DetailsScreen extends ConsumerWidget {
                     ),
                     Text(
                       details.address,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleSmall?.copyWith(color: Colors.black54),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Theme.of(context).hintColor,
+                      ),
                     ),
                     Text(
                       details.city,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleSmall?.copyWith(color: Colors.black54),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Theme.of(context).hintColor,
+                      ),
                     ),
                   ],
                 ),
@@ -165,9 +165,9 @@ class DetailsScreen extends ConsumerWidget {
                   Icon(Icons.star, color: Colors.orange),
                   Text(
                     details.rating.toString(),
-                    style: Theme.of(
-                      context,
-                    ).textTheme.labelSmall?.copyWith(color: Colors.black54),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).hintColor,
+                    ),
                   ),
                 ],
               ),

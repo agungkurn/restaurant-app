@@ -31,13 +31,13 @@ Widget _MainContent(BuildContext context, RestaurantListItem item) => Row(
           ),
           Row(
             children: [
-              Icon(Icons.location_pin, color: Colors.black54),
+              Icon(Icons.location_pin, color: Theme.of(context).hintColor),
               Text(
                 item.city,
                 maxLines: 1,
                 softWrap: true,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.black54),
+                style: TextStyle(color: Theme.of(context).hintColor),
               ),
             ],
           ),
@@ -47,9 +47,9 @@ Widget _MainContent(BuildContext context, RestaurantListItem item) => Row(
               Icon(Icons.star, color: Colors.orange),
               Text(
                 item.rating.toString(),
-                style: Theme.of(
-                  context,
-                ).textTheme.labelSmall?.copyWith(color: Colors.black54),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).hintColor,
+                ),
               ),
             ],
           ),
