@@ -9,9 +9,18 @@ class SettingsPreferences {
     return name == null ? ThemeOptions.system : ThemeOptions.find(name);
   }
 
-  void setTheme(ThemeOptions value) async {
+  Future<void> setTheme(ThemeOptions value) async {
     await _asyncPref.setString(KEY_THEME, value.name);
   }
 
+  Future<bool> reminderEnabled() async {
+    return await _asyncPref.getBool(KEY_REMINDER) == true;
+  }
+
+  Future<void> enableReminder(bool value) async {
+    await _asyncPref.setBool(KEY_REMINDER, value);
+  }
+
   static const KEY_THEME = "pref:theme";
+  static const KEY_REMINDER = "pref:reminder";
 }
