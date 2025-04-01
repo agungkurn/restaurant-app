@@ -62,6 +62,8 @@ dev_dependencies:
   json_serializable: ^6.9.4
   riverpod_generator: ^2.6.5
   riverpod_lint: ^2.6.5
+  test: ^1.25.15
+  mocktail: ^1.0.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
