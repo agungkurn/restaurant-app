@@ -21,53 +21,58 @@ class DetailsScreen extends ConsumerWidget {
       fetchRestaurantDetailsProvider(restaurantListItem.id),
     );
 
-    return Scaffold(
-      body: detailsState.when(
-        data:
-            (details) => DefaultTabController(
-              length: 3,
-              child: NestedScrollView(
-                headerSliverBuilder:
-                    (context, isScrolled) => [
-                      DetailsAppBar(context, ref, details),
-                      DetailsBasicInfo(context, details),
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: TabBarDelegate(
-                          TabBar(
-                            tabs: [
-                              Tab(text: "Description"),
-                              Tab(text: "Menu"),
-                              Tab(text: "Reviews"),
-                            ],
+    return PopScope(
+      onPopInvokedWithResult: (_, _) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      },
+      child: Scaffold(
+        body: detailsState.when(
+          data:
+              (details) => DefaultTabController(
+                length: 3,
+                child: NestedScrollView(
+                  headerSliverBuilder:
+                      (context, isScrolled) => [
+                        DetailsAppBar(context, ref, details),
+                        DetailsBasicInfo(context, details),
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: TabBarDelegate(
+                            TabBar(
+                              tabs: [
+                                Tab(text: "Description"),
+                                Tab(text: "Menu"),
+                                Tab(text: "Reviews"),
+                              ],
+                            ),
                           ),
                         ),
+                      ],
+                  body: TabBarView(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: RestaurantDescriptionWidget(
+                          description: details.description,
+                        ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: RestaurantMenuWidget(
+                          restaurantMenu: details.menus,
+                        ),
+                      ),
+                      RestaurantReviewWidget(reviews: details.customerReviews),
                     ],
-                body: TabBarView(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: RestaurantDescriptionWidget(
-                        description: details.description,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: RestaurantMenuWidget(
-                        restaurantMenu: details.menus,
-                      ),
-                    ),
-                    RestaurantReviewWidget(reviews: details.customerReviews),
-                  ],
+                  ),
                 ),
               ),
-            ),
-        error: (error, stackTrace) {
-          print(stackTrace);
-          return Center(child: Text(error.toString()));
-        },
-        loading: () => Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) {
+            print(stackTrace);
+            return Center(child: Text(error.toString()));
+          },
+          loading: () => Center(child: CircularProgressIndicator()),
+        ),
       ),
     );
   }
@@ -105,8 +110,8 @@ class DetailsScreen extends ConsumerWidget {
                   final snackbar = SnackBar(
                     content:
                         isInList
-                            ? Text("Removed from \"Go To List\"")
-                            : Text("Added to \"Go To List\""),
+                            ? Text("Removed from \"Saved Places\"")
+                            : Text("Added to \"Saved Places\""),
                   );
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
@@ -115,7 +120,7 @@ class DetailsScreen extends ConsumerWidget {
                   ref.invalidate(isInSavedPlacesProvider);
                 },
                 icon: Icon(
-                  isInList ? Icons.playlist_add_check : Icons.playlist_add,
+                  isInList ? Icons.add_location : Icons.add_location_outlined,
                 ),
               ),
           error: (_, _) => SizedBox.shrink(),
