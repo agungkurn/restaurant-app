@@ -29,11 +29,18 @@ class HomeScreen extends ConsumerWidget {
         print(stackTrace);
 
         return Center(
-          child: FilledButton(
-            onPressed: () {
-              ref.invalidate(fetchRestaurantListProvider);
-            },
-            child: Text("Retry"),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("An error occurred"),
+              FilledButton(
+                onPressed: () {
+                  ref.invalidate(fetchRestaurantListProvider);
+                },
+                child: Text("Retry"),
+              ),
+            ],
           ),
         );
       },

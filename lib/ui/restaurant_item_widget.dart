@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../constants/base_url_constants.dart';
 import '../data/model/restaurant_list_item.dart';
 
 Widget _MainContent(BuildContext context, RestaurantListItem item) => Row(
@@ -12,7 +13,10 @@ Widget _MainContent(BuildContext context, RestaurantListItem item) => Row(
       margin: EdgeInsets.only(right: 8),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
-        child: Image.network(item.picture, fit: BoxFit.cover),
+        child: Hero(
+          tag: item.picture.substring(Constants.baseImageSmallUrl.length),
+          child: Image.network(item.picture, fit: BoxFit.cover),
+        ),
       ),
     ),
     Expanded(

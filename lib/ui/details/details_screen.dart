@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_submission_2/constants/base_url_constants.dart';
 import 'package:flutter_submission_2/data/model/restaurant_details.dart';
 import 'package:flutter_submission_2/data/model/restaurant_list_item.dart';
 import 'package:flutter_submission_2/provider/details/restaurant_details_provider.dart';
@@ -69,7 +70,21 @@ class DetailsScreen extends ConsumerWidget {
               ),
           error: (error, stackTrace) {
             print(stackTrace);
-            return Center(child: Text(error.toString()));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("An error occurred"),
+                  FilledButton(
+                    onPressed: () {
+                      ref.invalidate(fetchRestaurantDetailsProvider);
+                    },
+                    child: Text("Retry"),
+                  ),
+                ],
+              ),
+            );
           },
           loading: () => Center(child: CircularProgressIndicator()),
         ),
@@ -90,7 +105,10 @@ class DetailsScreen extends ConsumerWidget {
       floating: false,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
-        background: Image.network(details.picture, fit: BoxFit.cover),
+        background: Hero(
+          tag: details.picture.substring(Constants.baseImageLargeUrl.length),
+          child: Image.network(details.picture, fit: BoxFit.cover),
+        ),
       ),
       leading: IconButton.filledTonal(
         onPressed: () {
