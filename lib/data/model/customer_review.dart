@@ -1,22 +1,21 @@
 import 'dart:convert';
 
-class CustomerReview {
-  final String name;
-  final String review;
-  final String date;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  CustomerReview({
-    required this.name,
-    required this.review,
-    required this.date,
-  });
+part 'customer_review.freezed.dart';
+part 'customer_review.g.dart';
+
+@freezed
+abstract class CustomerReview with _$CustomerReview {
+  factory CustomerReview({
+    required String name,
+    required String review,
+    required String date,
+  }) = _CustomerReview;
 
   factory CustomerReview.fromRawJson(String str) =>
       CustomerReview.fromJson(json.decode(str));
 
-  factory CustomerReview.fromJson(Map<String, dynamic> json) => CustomerReview(
-    name: json["name"],
-    review: json["review"],
-    date: json["date"],
-  );
+  factory CustomerReview.fromJson(Map<String, dynamic> json) =>
+      _$CustomerReviewFromJson(json);
 }
